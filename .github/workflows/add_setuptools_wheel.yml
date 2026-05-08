@@ -1,0 +1,25 @@
+name: Add setuptools and wheel to deps
+
+on: workflow_dispatch
+
+permissions:
+  contents: write
+
+jobs:
+  add-wheels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download setuptools and wheel
+        run: |
+          mkdir -p deps
+          python3 -m pip download setuptools wheel -d deps
+
+      - name: Commit and push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add deps/
+          git commit -m "Add setuptools and wheel to deps"
+          git push
