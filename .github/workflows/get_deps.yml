@@ -1,4 +1,4 @@
-name: Collect mhr-cfw dependencies
+name: Collect mhr-cfw dependencies (complete)
 
 on: workflow_dispatch
 
@@ -7,18 +7,20 @@ permissions:
 
 jobs:
   collect:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download .deb packages for pip
+      - name: Download all required system packages
         run: |
           sudo apt update
-          apt download python3-pip python3-wheel python3-setuptools
+          apt download python3-pip python3-setuptools python3-wheel python3-pkg-resources
 
-      - name: Download Python wheels for project
+      - name: Download all Python wheels including cryptography
         run: |
           pip3 download -d wheels -r requirements.txt
+          # cryptography has many prebuilt wheels, force re-download if necessary
+          pip3 download cryptography -d wheels
 
       - name: Put everything in deps folder and push
         run: |
@@ -28,5 +30,5 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add deps/
-          git commit -m "Add offline dependencies"
+          git commit -m "Add complete offline dependencies"
           git push
